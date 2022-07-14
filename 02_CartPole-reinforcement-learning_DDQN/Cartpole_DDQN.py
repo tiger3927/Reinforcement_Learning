@@ -7,9 +7,9 @@ import gym
 import pylab
 import numpy as np
 from collections import deque
-from keras.models import Model, load_model
-from keras.layers import Input, Dense
-from keras.optimizers import Adam, RMSprop
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.optimizers import Adam, RMSprop
 
 
 def OurModel(input_shape, action_space):
@@ -29,7 +29,7 @@ def OurModel(input_shape, action_space):
     # Output Layer with # of actions: 2 nodes (left, right)
     X = Dense(action_space, activation="linear", kernel_initializer='he_uniform')(X)
 
-    model = Model(inputs = X_input, outputs = X, name='CartPole DDQN model')
+    model = Model(inputs = X_input, outputs = X)#, name='CartPole DDQN model')
     model.compile(loss="mean_squared_error", optimizer=RMSprop(lr=0.00025, rho=0.95, epsilon=0.01), metrics=["accuracy"])
 
     model.summary()
