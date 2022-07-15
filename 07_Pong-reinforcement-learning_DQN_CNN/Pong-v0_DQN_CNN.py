@@ -9,10 +9,18 @@ import gym
 import pylab
 import numpy as np
 from collections import deque
-from keras.models import Model, load_model
-from keras.layers import Input, Dense, Lambda, Add, Conv2D, Flatten
-from keras.optimizers import Adam, RMSprop
-from keras import backend as K
+
+
+import tensorflow as tf
+
+from tensorflow.python.keras.models import Model, load_model
+from tensorflow.python.keras.layers import Input, Dense, Lambda, Add, Conv2D, Flatten
+from tensorflow.python.keras.optimizer_v2.adam import Adam
+from tensorflow.python.keras.optimizer_v2.rmsprop import RMSprop
+from tensorflow.python.keras import backend as K
+
+
+
 from PER import *
 import cv2
 
@@ -56,7 +64,7 @@ def OurModel(input_shape, action_space, dueling):
 class DQNAgent:
     def __init__(self, env_name):
         self.env_name = env_name       
-        self.env = gym.make(env_name)
+        self.env = gym.make(env_name,render_mode="human")
         #self.env.seed(0)  
         self.action_size = self.env.action_space.n
         self.EPISODES = 1000
