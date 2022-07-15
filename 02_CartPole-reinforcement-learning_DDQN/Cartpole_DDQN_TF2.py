@@ -8,9 +8,12 @@ import pylab
 import numpy as np
 from collections import deque
 import tensorflow as tf
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.layers import Input, Dense
-from tensorflow.keras.optimizers import Adam, RMSprop
+
+from tensorflow.python.keras.models import Model, load_model
+from tensorflow.python.keras.layers import Input, Dense
+from tensorflow.python.keras.optimizer_v2.adam import Adam
+from tensorflow.python.keras.optimizer_v2.rmsprop import RMSprop
+
 
 
 def OurModel(input_shape, action_space):

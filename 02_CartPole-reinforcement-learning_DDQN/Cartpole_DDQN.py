@@ -7,10 +7,13 @@ import gym
 import pylab
 import numpy as np
 from collections import deque
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.layers import Input, Dense
-from tensorflow.keras.optimizers import Adam, RMSprop
 
+import tensorflow as tf
+
+from tensorflow.python.keras.models import Model, load_model
+from tensorflow.python.keras.layers import Input, Dense
+from tensorflow.python.keras.optimizer_v2.adam import Adam
+from tensorflow.python.keras.optimizer_v2.rmsprop import RMSprop
 
 def OurModel(input_shape, action_space):
     X_input = Input(input_shape)
@@ -52,7 +55,7 @@ class DQNAgent:
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.999
-        self.batch_size = 32
+        self.batch_size = 512
         self.train_start = 1000
 
         # defining model parameters
@@ -178,6 +181,7 @@ class DQNAgent:
         return str(self.average[-1])[:5]
     
     def run(self):
+        self.load("cartpole-ddqn.h5")
         for e in range(self.EPISODES):
             state = self.env.reset()
             state = np.reshape(state, [1, self.state_size])
@@ -200,13 +204,14 @@ class DQNAgent:
                     self.update_target_model()
                     
                     # every episode, plot the result
-                    average = self.PlotModel(i, e)
+                    average=0
+                    # average = self.PlotModel(i, e)
                      
                     print("episode: {}/{}, score: {}, e: {:.2}, average: {}".format(e, self.EPISODES, i, self.epsilon, average))
-                    if i == self.env._max_episode_steps:
+                    if i >= self.env._max_episode_steps:
                         print("Saving trained model as cartpole-ddqn.h5")
-                        #self.save("cartpole-ddqn.h5")
-                        break
+                        self.save("cartpole-ddqn.h5")
+                        #break
                 self.replay()
 
     def test(self):
@@ -227,6 +232,18 @@ class DQNAgent:
                     break
 
 if __name__ == "__main__":
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            # 设置 GPU 显存占用为按需分配，增长式
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+        except RuntimeError as e:
+            # 异常处理
+            print(e)
+
     env_name = 'CartPole-v1'
     agent = DQNAgent(env_name)
     agent.run()

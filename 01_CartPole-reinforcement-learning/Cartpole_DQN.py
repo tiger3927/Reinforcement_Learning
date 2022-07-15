@@ -13,8 +13,8 @@ import tensorflow as tf
 
 from tensorflow.python.keras.models import Model, load_model
 from tensorflow.python.keras.layers import Input, Dense
-from tensorflow.keras.optimizers import Adam, RMSprop
-
+from tensorflow.python.keras.optimizer_v2.adam import Adam
+from tensorflow.python.keras.optimizer_v2.rmsprop import RMSprop
 
 def OurModel(input_shape, action_space):
     X_input = Input(input_shape)
@@ -122,6 +122,9 @@ class DQNAgent:
         self.model.save(name)
 
     def run(self):
+        if os.path.exists('cartpole-dqn.h5'):
+            self.load("cartpole-dqn.h5")
+            self.epsilon = 0.01
         for e in range(self.EPISODES):
             state = self.env.reset()
             state = np.reshape(state, [1, self.state_size])
@@ -142,7 +145,7 @@ class DQNAgent:
                 if done:
                     print("episode: {}/{}, score: {}, e: {:.2} , {}".format(e, self.EPISODES, i, self.epsilon,
                                                                             len(self.memory)))
-                    if i >= 500:  # 坚持很久了
+                    if i >= self.env._max_episode_steps: # 坚持很久了
                         print("Saving trained model as cartpole-dqn.h5")
                         self.save("cartpole-dqn.h5")
                         #return
@@ -157,11 +160,7 @@ class DQNAgent:
             i = 0
             while not done:
                 self.env.render()
-                aaa=self.model.predict(state)
-                print("------------------------------------------------------------")
-                print(aaa)
                 action = np.argmax(self.model.predict(state))
-                print(action)
                 next_state, reward, done, _ = self.env.step(action)
                 state = np.reshape(next_state, [1, self.state_size])
                 i += 1
@@ -183,5 +182,5 @@ if __name__ == "__main__":
             print(e)
 
     agent = DQNAgent()
-    agent.run()
-    #agent.test()
+    #agent.run()
+    agent.test()
