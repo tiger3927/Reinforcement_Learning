@@ -7,10 +7,14 @@ import gym
 import pylab
 import numpy as np
 from collections import deque
-from keras.models import Model, load_model
-from keras.layers import Input, Dense, Lambda, Add, Conv2D, Flatten
-from keras.optimizers import Adam, RMSprop
-from keras import backend as K
+
+import tensorflow as tf
+
+from tensorflow.python.keras.models import Model, load_model
+from tensorflow.python.keras.layers import Input, Dense, Lambda, Add, Conv2D, Flatten
+from tensorflow.python.keras.optimizer_v2.adam import Adam
+from tensorflow.python.keras.optimizer_v2.rmsprop import RMSprop
+from tensorflow.python.keras import backend as K
 from PER import *
 import cv2
 
@@ -44,7 +48,7 @@ def OurModel(input_shape, action_space, dueling):
         # Output Layer with # of actions: 2 nodes (left, right)
         X = Dense(action_space, activation="linear", kernel_initializer='he_uniform')(X)
 
-    model = Model(inputs = X_input, outputs = X, name='CartPole PER D3QN CNN model')
+    model = Model(inputs = X_input, outputs = X)#, name='CartPole PER D3QN CNN model')
     model.compile(loss="mean_squared_error", optimizer=RMSprop(lr=0.00025, rho=0.95, epsilon=0.01), metrics=["accuracy"])
 
     model.summary()
@@ -310,7 +314,7 @@ class DQNAgent:
             i = 0
             while not done:
                 action = np.argmax(self.model.predict(state))
-                next_state, reward, done, _ = env.step(action)
+                next_state, reward, done, _ = self.env.step(action)
                 i += 1
                 if done:
                     print("episode: {}/{}, score: {}".format(e, self.EPISODES, i))
