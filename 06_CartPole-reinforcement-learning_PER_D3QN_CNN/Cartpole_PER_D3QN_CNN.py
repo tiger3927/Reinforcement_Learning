@@ -28,10 +28,10 @@ def OurModel(input_shape, action_space, dueling):
     X = Flatten()(X)
     # 'Dense' is the basic form of a neural network layer
     # Input Layer of state size(4) and Hidden Layer with 512 nodes
-    X = Dense(512, activation="relu", kernel_initializer='he_uniform')(X)
+    X = Dense(128, activation="relu", kernel_initializer='he_uniform')(X)
 
     # Hidden layer with 256 nodes
-    X = Dense(256, activation="relu", kernel_initializer='he_uniform')(X)
+    X = Dense(128, activation="relu", kernel_initializer='he_uniform')(X)
     
     # Hidden layer with 64 nodes
     X = Dense(64, activation="relu", kernel_initializer='he_uniform')(X)
@@ -78,7 +78,7 @@ class DQNAgent:
         self.epsilon_min = 0.01  # minimum exploration probability 
         self.epsilon_decay = 0.0005  # exponential decay rate for exploration prob
         
-        self.batch_size = 32
+        self.batch_size = 16
 
         # defining model parameters
         self.ddqn = True # use doudle deep q network
@@ -321,6 +321,17 @@ class DQNAgent:
                     break
 
 if __name__ == "__main__":
+
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            # 设置 GPU 显存占用为按需分配，增长式
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+        except RuntimeError as e:
+            # 异常处理
+            print(e)
+
     env_name = 'CartPole-v1'
     agent = DQNAgent(env_name)
     agent.run()
